@@ -5,4 +5,35 @@
              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
     <display-name>java-webapp</display-name>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <!-- Порожній список welcome-file: інакше Tomcat віддає index.jsp
+         напряму і запит не доходить до homeServlet -->
+    <welcome-file-list>
+        <welcome-file></welcome-file>
+    </welcome-file-list>
+
+    <!-- Аналог інструкції homeServlet = new HomeServlet() -->
+    <servlet>
+        <servlet-name>homeServlet</servlet-name>
+        <servlet-class>step.learning.java231web.servlets.HomeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>homeServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>aboutServlet</servlet-name>
+        <servlet-class>step.learning.java231web.servlets.AboutServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>aboutServlet</servlet-name>
+        <url-pattern>/about</url-pattern>
+    </servlet-mapping>
 </web-app>
