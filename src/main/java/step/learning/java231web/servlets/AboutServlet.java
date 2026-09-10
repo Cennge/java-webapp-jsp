@@ -15,8 +15,8 @@ public class AboutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("servlet", "About");
-        // передаємо управління на представлення (~return View("about.jsp"))
-        req.getRequestDispatcher("about.jsp")
+        // передаємо управління на представлення (~return View("index.jsp"))
+        req.getRequestDispatcher("index.jsp")
                 .forward(req, resp);
     }
 

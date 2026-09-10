@@ -27,6 +27,13 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
+    <!-- Статичні ресурси віддає стандартний сервлет Tomcat,
+         інакше їх перехоплює homeServlet з url-pattern "/" -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/css/*</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>aboutServlet</servlet-name>
         <servlet-class>step.learning.java231web.servlets.AboutServlet</servlet-class>
@@ -35,5 +42,15 @@
     <servlet-mapping>
         <servlet-name>aboutServlet</servlet-name>
         <url-pattern>/about</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>privacyServlet</servlet-name>
+        <servlet-class>step.learning.java231web.servlets.PrivacyServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>privacyServlet</servlet-name>
+        <url-pattern>/privacy</url-pattern>
     </servlet-mapping>
 </web-app>
