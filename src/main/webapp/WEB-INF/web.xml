@@ -65,4 +65,14 @@
         <servlet-name>privacyServlet</servlet-name>
         <url-pattern>/privacy</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>gsonServlet</servlet-name>
+        <servlet-class>step.learning.java231web.servlets.GsonServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>gsonServlet</servlet-name>
+        <url-pattern>/gson</url-pattern>
+    </servlet-mapping>
 </web-app>

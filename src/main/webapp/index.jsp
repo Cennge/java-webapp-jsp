@@ -15,6 +15,10 @@
     }
     Charset charset = (Charset) request.getAttribute("charset");
     String charsetName = charset == null ? "undefined" : charset.name();
+
+    String contextPath = request.getContextPath();  // частина адреси,
+    // що відповідає за контекст - назва проєкту. Починається з "/",
+    // завершується без "/"
 %>
 <!DOCTYPE html>
 <html>
@@ -30,6 +34,7 @@
             <a href="home">Home</a>
             <a href="about">About</a>
             <a href="privacy">Privacy</a>
+            <a href="/gson">Gson</a>
         </nav>
 
         <main>
@@ -42,6 +47,8 @@
             <a href="privacy">Privacy</a>
             &middot;
             Show in '<%= charsetName %>'
+            &middot;
+            Auth: <%= request.getAttribute("auth") %>
         </footer>
     </body>
 </html>
