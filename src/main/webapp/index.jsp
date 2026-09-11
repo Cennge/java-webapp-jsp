@@ -5,14 +5,16 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.nio.charset.Charset"%>
 <%
     String viewName = (String) request.getAttribute("servlet");
     if (viewName == null) {
-        viewName = "home";
+        viewName = "home.jsp";
     } else {
-        viewName = viewName.toLowerCase();
+        viewName = viewName.toLowerCase() + ".jsp";
     }
-    String viewPage = viewName + ".jsp";
+    Charset charset = (Charset) request.getAttribute("charset");
+    String charsetName = charset == null ? "undefined" : charset.name();
 %>
 <!DOCTYPE html>
 <html>
@@ -31,13 +33,15 @@
         </nav>
 
         <main>
-            <jsp:include page="<%=viewPage%>" />
+            <jsp:include page="<%=viewName%>" />
         </main>
 
         <footer>
             &copy; 2026 java-webapp
             &middot;
             <a href="privacy">Privacy</a>
+            &middot;
+            Show in '<%= charsetName %>'
         </footer>
     </body>
 </html>
