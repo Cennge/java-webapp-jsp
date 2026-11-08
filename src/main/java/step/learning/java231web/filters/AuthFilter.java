@@ -1,18 +1,20 @@
 package step.learning.java231web.filters;
 
+import com.google.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
  * Фільтр перевірки авторизації
  * @author ilyag
  */
-@WebFilter("/*")  // анотації спрощують реєстрацію фільтрів, але
+// через IoC анотацію змінено
+@Singleton
+// @WebFilter("/*")  // анотації спрощують реєстрацію фільтрів, але
 // !! не дозволяють регулювати їх порядок
 // тоді як web.xml чи IoC дозволяють
 public class AuthFilter implements Filter {

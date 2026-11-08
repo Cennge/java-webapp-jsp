@@ -40,3 +40,5 @@ build/
 
 ### SmartTomcat ###
 .smarttomcat/
+### Playwright MCP (снимки сторінок, тестові файли) ###
+.playwright-mcp/

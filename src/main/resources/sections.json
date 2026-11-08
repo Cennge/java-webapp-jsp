@@ -1,0 +1,233 @@
+[
+  {
+    "id": "3bf2933c-2172-4b5e-a464-89d1bfc872a5",
+    "parentId": "ef8c86dd-3aed-4a94-b192-4e90c22a4fe9",
+    "title": "Клавіатури",
+    "description": "Ігрові клавіатури та миші",
+    "slug": "gaming-kb",
+    "imageUrl": "bb5930be-b7fa-4353-8781-fd053f60fa91.webp",
+    "deletedAt": null,
+    "orderInPrice": 1,
+    "products": []
+  },
+  {
+    "id": "3b1be655-76d1-4936-a806-08dd7b9ed775",
+    "parentId": "3bf2933c-2172-4b5e-a464-89d1bfc872a5",
+    "title": "Клавіатури Ajazz",
+    "description": "Ajazz клавіатури з Китаю",
+    "slug": "kb-ajazz",
+    "imageUrl": "096f7e4a-c452-43cf-a616-dd32c7bd05cc.webp",
+    "deletedAt": null,
+    "orderInPrice": 1,
+    "products": []
+  },
+  {
+    "id": "bfbf3971-31a9-46c2-94b9-a18c87075a86",
+    "parentId": "ef8c86dd-3aed-4a94-b192-4e90c22a4fe9",
+    "title": "Джойстики",
+    "description": "Ігрові джойстики, контролери, маніпулятори",
+    "slug": "gaming-joystick",
+    "imageUrl": "b883591b-47a4-414e-a4a3-dfdeeb43277b.webp",
+    "deletedAt": null,
+    "orderInPrice": 2,
+    "products": []
+  },
+  {
+    "id": "3a27db1d-d97e-406f-a36a-148b4f724a6e",
+    "parentId": null,
+    "title": "Garminfull",
+    "description": "garminfull",
+    "slug": "garminfull",
+    "imageUrl": "https://localhost:7015/Storage/Item/84dd3b41-e654-4c64-b784-25031bf675ed.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "1fb04898-3225-422a-8592-37a17b74ad8c",
+    "parentId": null,
+    "title": "Телевізори",
+    "description": "Телевізори",
+    "slug": "tv",
+    "imageUrl": "https://localhost:7015/Storage/Item/f6ffd9f8-75b6-4a97-9abd-85733178b9ff.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "ef8c86dd-3aed-4a94-b192-4e90c22a4fe9",
+    "parentId": null,
+    "title": "Консолі",
+    "description": "Ігрові консолі",
+    "slug": "consoles",
+    "imageUrl": "https://localhost:7015/Storage/Item/3632c102-86f1-4b01-9c34-8af14967c003.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "3312c6ce-621b-4336-8158-515f7988cc4b",
+    "parentId": null,
+    "title": "б/у Apple",
+    "description": "Техніка Apple що була у вжитку",
+    "slug": "applebw",
+    "imageUrl": "https://localhost:7015/Storage/Item/d7ac61ab-197d-4815-818c-d0b07ed6bef5.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "a1267875-bbb1-48e4-af51-57d153e0ffe6",
+    "parentId": null,
+    "title": "Смартфони",
+    "description": "Смартфони Android",
+    "slug": "android",
+    "imageUrl": "https://localhost:7015/Storage/Item/c8e2a6bc-691f-47e1-875e-417de5971a19.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "6f5569d6-bc35-48d8-82d9-58fc50357219",
+    "parentId": null,
+    "title": "AirPods",
+    "description": "Apple airpods",
+    "slug": "airpods",
+    "imageUrl": "https://localhost:7015/Storage/Item/72583b9d-5d77-447a-b88b-bc1670f83640.webp",
+    "deletedAt": null,
+    "orderInPrice": 2,
+    "products": []
+  },
+  {
+    "id": "6a8b7644-6233-4829-b8e8-593ba8392751",
+    "parentId": null,
+    "title": "Монітори",
+    "description": "Монітори",
+    "slug": "monitors",
+    "imageUrl": "https://localhost:7015/Storage/Item/9375f36c-1ef7-4d7a-a040-4d45b06ca28e.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "856a488c-5041-4bf8-992f-6997943a7147",
+    "parentId": null,
+    "title": "Ноутбуки",
+    "description": "Ноутбуки",
+    "slug": "notebooks",
+    "imageUrl": "https://localhost:7015/Storage/Item/99eddce0-22a2-47f2-89f0-b7d2c0273194.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "eb4b0f71-fbb7-44a8-a7ca-7125b5e645c9",
+    "parentId": null,
+    "title": "Home Carefull",
+    "description": "home-carefull",
+    "slug": "home-carefull",
+    "imageUrl": "https://localhost:7015/Storage/Item/d6bb281f-b5f1-402d-a441-5429d91ce631.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "a4864df2-9483-42ab-82ff-761873149ff3",
+    "parentId": null,
+    "title": "Екшн Камери",
+    "description": "Екшн Камери",
+    "slug": "action-cameras",
+    "imageUrl": "https://localhost:7015/Storage/Item/78fc7e11-11e9-4e4d-855c-a19201e87278.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "f7422e86-1f82-441a-a6bb-9de8deeaf1b5",
+    "parentId": null,
+    "title": "Apple",
+    "description": "Техніка Apple",
+    "slug": "apple",
+    "imageUrl": "https://localhost:7015/Storage/Item/3893d732-5f61-4587-a728-c246c6cddf5d.webp",
+    "deletedAt": null,
+    "orderInPrice": 1,
+    "products": []
+  },
+  {
+    "id": "46c21666-9300-4789-949d-b3e8321c57d3",
+    "parentId": null,
+    "title": "iPhone",
+    "description": "Пристрої iPhone",
+    "slug": "iphonefull",
+    "imageUrl": "https://localhost:7015/Storage/Item/5a2b0648-7a57-4597-9315-695c55742590.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "8194b31e-6790-4777-8689-c1ba2d09dc9d",
+    "parentId": null,
+    "title": "Micefull",
+    "description": "micefull",
+    "slug": "micefull",
+    "imageUrl": "https://localhost:7015/Storage/Item/ab63713e-7441-41e1-96be-408c92f3e13c.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "0e7fbcd7-9896-4bcc-b8e1-c1cb12a74cfa",
+    "parentId": null,
+    "title": "Acsfull",
+    "description": "acsfull",
+    "slug": "acsfull",
+    "imageUrl": "https://localhost:7015/Storage/Item/bb567003-4b62-4529-90df-bac67e0b6c2d.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "99aeb202-4211-4208-9a3b-d52f1e65f76f",
+    "parentId": null,
+    "title": "Dyson",
+    "description": "Техніка Dyson",
+    "slug": "dysonfull",
+    "imageUrl": "https://localhost:7015/Storage/Item/73a69689-4441-4894-9fa1-8d7a8a66f21d.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "f38c33d4-ec6c-4449-998f-e1ec7485f3a5",
+    "parentId": null,
+    "title": "Headphones",
+    "description": "headphonesfull",
+    "slug": "headphonesfull",
+    "imageUrl": "https://localhost:7015/Storage/Item/21236362-644b-474d-9059-49b1ba68f52b.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "c1736401-d393-4e66-a5da-ec796fba1841",
+    "parentId": null,
+    "title": "Фотоапарати",
+    "description": "Фотоапарати",
+    "slug": "photo",
+    "imageUrl": "https://localhost:7015/Storage/Item/08693ea2-b6fa-4027-90bc-2b10cc9f6648.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  },
+  {
+    "id": "19202f7e-8375-45b7-82be-f3f272e98614",
+    "parentId": null,
+    "title": "Kitchenfull",
+    "description": "Kitchenfull",
+    "slug": "kitchenfull",
+    "imageUrl": "https://localhost:7015/Storage/Item/e74fa29f-98f6-40e3-8555-e7036f1ea902.webp",
+    "deletedAt": null,
+    "orderInPrice": 10000,
+    "products": []
+  }
+]

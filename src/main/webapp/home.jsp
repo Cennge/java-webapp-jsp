@@ -61,6 +61,12 @@
                 Як частина інверсії управління
             </li>
         </ul>
+        <h2>Сервіси (IoC)</h2>
+        <ul>
+            <li>Hash (MD5 з "123"): <code><%= request.getAttribute("hash") %></code></li>
+            <li>Timestamp, 10 цифр (секунди): <code><%= request.getAttribute("timestamp10") %></code></li>
+            <li>Timestamp, 13 цифр (мілісекунди): <code><%= request.getAttribute("timestamp13") %></code></li>
+        </ul>
         <p>
             Контроль проходження сервлету: <%= request.getAttribute("servlet") %>
         </p>

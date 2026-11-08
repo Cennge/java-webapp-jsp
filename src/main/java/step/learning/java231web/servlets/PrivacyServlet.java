@@ -1,5 +1,6 @@
 package step.learning.java231web.servlets;
 
+import com.google.inject.Singleton;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import java.io.IOException;
  *
  * @author ilyag
  */
+@Singleton
 public class PrivacyServlet extends HttpServlet {
 
     @Override

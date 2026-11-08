@@ -1,5 +1,6 @@
 package step.learning.java231web.filters;
 
+import com.google.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets;
  * Сервлетний фільтр для узгодження кодування символів
  * @author ilyag
  */
+@Singleton
 public class EncodingFilter implements Filter {
 
     private FilterConfig filterConfig;
