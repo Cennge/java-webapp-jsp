@@ -7,6 +7,7 @@ import step.learning.java231web.filters.EncodingFilter;
 import step.learning.java231web.servlets.AboutServlet;
 import step.learning.java231web.servlets.AdminServlet;
 import step.learning.java231web.servlets.BackServlet;
+import step.learning.java231web.servlets.CartServlet;
 import step.learning.java231web.servlets.CatalogServlet;
 import step.learning.java231web.servlets.DbServlet;
 import step.learning.java231web.servlets.GsonServlet;
@@ -48,6 +49,7 @@ public class IocServletsModule extends ServletModule {
         serve("/product", "/product/*").with( ProductServlet.class        );
         serve("/storage/*"            ).with( StorageServlet.class        );
         serve("/catalog", "/catalog/*").with( CatalogServlet.class        );
+        serve("/cart",    "/cart/*"   ).with( CartServlet.class           );
     }
 
 }

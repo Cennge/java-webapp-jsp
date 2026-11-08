@@ -47,6 +47,7 @@ public class RestStatus {
     public static final RestStatus Created             = of(201, "Created");
     public static final RestStatus Accepted            = of(202, "Accepted");
     public static final RestStatus NoContent           = of(204, "No Content");
+    public static final RestStatus AlreadyReported     = of(208, "Already Reported");
     public static final RestStatus PartialContent      = of(206, "Partial Content");
 
     // ----- STANDARD: 3xx Redirection --------

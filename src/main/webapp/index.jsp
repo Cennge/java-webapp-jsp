@@ -6,6 +6,8 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.nio.charset.Charset"%>
+<%@page import="step.learning.java231web.models.AuthUser"%>
+<%@page import="step.learning.java231web.util.Html"%>
 <%
     String viewName = (String) request.getAttribute("servlet");
     // шлях від кореня застосунку: сторінки з вкладеними адресами (/admin/product)
@@ -101,7 +103,8 @@
             &middot;
             Show in '<%= charsetName %>'
             &middot;
-            Auth: <%= request.getAttribute("auth") %>
+            Auth: <% AuthUser authUser = (AuthUser) request.getAttribute(AuthUser.ATTRIBUTE); %>
+            <%= authUser == null ? "guest" : Html.esc(authUser.login() + " (" + authUser.role() + ")") %>
         </footer>
     </body>
 </html>

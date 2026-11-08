@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import step.learning.java231web.data.dao.CartDao;
 import step.learning.java231web.data.dao.ProductDao;
 import step.learning.java231web.data.dao.ProductSectionDao;
 import step.learning.java231web.data.dao.ProductVersionDao;
@@ -32,13 +33,19 @@ public class DataContext {
     private final ProductSectionDao sections;
     private final ProductDao products;
     private final ProductVersionDao versions;
+    private final CartDao carts;
     private volatile boolean installed = false;
 
     @Inject
-    public DataContext(ProductSectionDao sections, ProductDao products, ProductVersionDao versions) {
+    public DataContext(ProductSectionDao sections, ProductDao products, ProductVersionDao versions, CartDao carts) {
         this.sections = sections;
         this.products = products;
         this.versions = versions;
+        this.carts = carts;
+    }
+
+    public CartDao carts() {
+        return carts;
     }
 
     public ProductSectionDao sections() {
@@ -68,6 +75,7 @@ public class DataContext {
             sections.createTable();
             products.createTable();
             versions.createTable();
+            carts.createTable();
             if (sections.count() == 0) {
                 seed();
             }

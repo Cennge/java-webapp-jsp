@@ -84,6 +84,17 @@ public class ProductVersionDao {
         return list;
     }
 
+    /** Версія за id, у т.ч. видалена (для перевірок кошика) */
+    public ProductVersion getByIdIncludingDeleted(String id) throws SQLException {
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(
+                "SELECT * FROM product_versions WHERE product_version_id = ?")) {
+            prep.setString(1, id);
+            try (ResultSet rs = prep.executeQuery()) {
+                return rs.next() ? ProductVersion.fromResultSet(rs) : null;
+            }
+        }
+    }
+
     public boolean isSlugAddonAvailable(String productId, String slugAddon) throws SQLException {
         String sql = "SELECT COUNT(*) FROM product_versions WHERE product_id = ? AND product_version_slug_addon = ?";
         try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {

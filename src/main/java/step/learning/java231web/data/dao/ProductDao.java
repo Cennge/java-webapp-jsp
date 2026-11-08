@@ -148,6 +148,17 @@ public class ProductDao {
         }
     }
 
+    /** Товар за id, у т.ч. видалений (для перевірок кошика) */
+    public Product getByIdIncludingDeleted(String id) throws SQLException {
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(
+                "SELECT * FROM products WHERE product_id = ?")) {
+            prep.setString(1, id);
+            try (ResultSet rs = prep.executeQuery()) {
+                return rs.next() ? Product.fromResultSet(rs) : null;
+            }
+        }
+    }
+
     private List<Product> readList(PreparedStatement prep) throws SQLException {
         List<Product> list = new ArrayList<>();
         try (ResultSet rs = prep.executeQuery()) {
