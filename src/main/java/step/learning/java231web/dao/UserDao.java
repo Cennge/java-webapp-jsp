@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import step.learning.java231web.models.AuthUser;
 import step.learning.java231web.models.UserAccessItem;
 import step.learning.java231web.models.UserSignupFormModel;
 import step.learning.java231web.rest.RestPagination;
@@ -82,6 +83,24 @@ public class UserDao {
         try (Statement statement = dbService.getConnection().createStatement();
              ResultSet rs = statement.executeQuery(sql)) {
             return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    /**
+     * Користувач за ідентифікатором (для перевірки ?ua=&lt;id&gt; на домашній сторінці)
+     * @return AuthUser або null, якщо такого (не видаленого) користувача немає
+     */
+    public AuthUser getAuthUserById(String id) throws SQLException {
+        String sql = "SELECT id, COALESCE(login, name) AS login, name, email, role FROM user "
+                + "WHERE id = ? AND deleted_at IS NULL";
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+            prep.setString(1, id);
+            try (ResultSet rs = prep.executeQuery()) {
+                return rs.next()
+                        ? new AuthUser(rs.getString("id"), rs.getString("login"), rs.getString("name"),
+                                rs.getString("email"), rs.getString("role"))
+                        : null;
+            }
         }
     }
 

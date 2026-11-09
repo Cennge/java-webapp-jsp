@@ -67,13 +67,14 @@
         <% AuthUser user = (AuthUser) request.getAttribute(AuthUser.ATTRIBUTE);
            Object authError = request.getAttribute("authError"); %>
         <% if (user != null) { %>
-            <p class="card timestamp-card">&#10004; Токен дійсний: <b><%= Html.esc(user.name()) %></b>
-               (логін <code><%= Html.esc(user.login()) %></code>, роль <code><%= Html.esc(user.role()) %></code>,
-               id <code><%= Html.esc(user.id()) %></code>)</p>
+            <p class="card timestamp-card">&#10004; Авторизовано
+               (<%= "id".equals(request.getAttribute("authSource")) ? "за id користувача" : "за токеном" %>):
+               id <code><%= Html.esc(user.id()) %></code>, ім'я <b><%= Html.esc(user.name()) %></b>
+               (логін <code><%= Html.esc(user.login()) %></code>, роль <code><%= Html.esc(user.role()) %></code>)</p>
         <% } else if (authError != null) { %>
-            <p class="card" style="border-left:4px solid #dc2626">&#9888; Токен недійсний: <%= Html.esc(((Exception) authError).getMessage()) %></p>
+            <p class="card" style="border-left:4px solid #dc2626">&#9888; Авторизацію не пройдено: <%= Html.esc(((Exception) authError).getMessage()) %></p>
         <% } else { %>
-            <p class="card">Токен не передано. Додайте до адреси <code>?ua={token}</code>
+            <p class="card">Токен не передано. Додайте до адреси <code>?ua={id користувача}</code> або <code>?ua={token}</code>
                (токен видає <code>GET /user</code> з Basic-авторизацією).</p>
         <% } %>
 
