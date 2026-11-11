@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "8cc383bd-d51b-429e-a008-1ae484575eef",
+    "_postman_id": "14d4a737-0a81-430a-b3e4-e96e3e32dab3",
     "name": "java-webapp /cart",
     "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -3855,6 +3855,407 @@
           }
         }
       ]
+    },
+    {
+      "name": "9. Історія: /cart/ordered та /cart/dropped",
+      "description": "/cart/ordered - лише оформлені кошики (без скасованих), /cart/dropped - лише скасовані, /cart/history - усі закриті",
+      "item": [
+        {
+          "name": "Setup: add item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: checkout -> orderedCartId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"orderedCartId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: add item (new cart)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: drop cart -> droppedCartId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"droppedCartId\", pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /cart/ordered -> only ordered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"non-empty, all ordered\", () => { const d = pm.response.json().data; pm.expect(d).to.not.be.empty; d.forEach(c => pm.expect(c.state).to.eql(\"ordered\")); });",
+                  "pm.test(\"contains {{orderedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.include(pm.collectionVariables.get(\"orderedCartId\")));",
+                  "pm.test(\"does not contain {{droppedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.not.include(pm.collectionVariables.get(\"droppedCartId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/ordered",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "ordered"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /cart/dropped -> only dropped",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"non-empty, all dropped\", () => { const d = pm.response.json().data; pm.expect(d).to.not.be.empty; d.forEach(c => pm.expect(c.state).to.eql(\"dropped\")); });",
+                  "pm.test(\"contains {{droppedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.include(pm.collectionVariables.get(\"droppedCartId\")));",
+                  "pm.test(\"does not contain {{orderedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.not.include(pm.collectionVariables.get(\"orderedCartId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/dropped",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "dropped"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /cart/history -> both",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"contains {{orderedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.include(pm.collectionVariables.get(\"orderedCartId\")));",
+                  "pm.test(\"contains {{droppedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.include(pm.collectionVariables.get(\"droppedCartId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "history"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /cart/ordered without token -> 444 / HTTP 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [444]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([444]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/ordered",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "ordered"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "GET /cart/dropped other user -> no buyer carts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"does not contain {{droppedCartId}}\", () => pm.expect(pm.response.json().data.map(c => c.id)).to.not.include(pm.collectionVariables.get(\"droppedCartId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/dropped",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "dropped"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -3908,6 +4309,14 @@
     },
     {
       "key": "ciidOpen",
+      "value": ""
+    },
+    {
+      "key": "orderedCartId",
+      "value": ""
+    },
+    {
+      "key": "droppedCartId",
       "value": ""
     },
     {

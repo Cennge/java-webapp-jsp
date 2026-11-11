@@ -86,6 +86,8 @@ public class CartServlet extends RestServlet {
         if (tail.isEmpty()) {
             return ok(req, dataContext.carts().getOpenCart(user.id()));
         }
+        // Д.З. /cart/ordered - історія лише придбаних (оформлених) кошиків, без скасованих;
+        //      /cart/dropped - лише скасовані; /cart/history - усі закриті
         Integer status = switch (tail) {
             case "ordered" -> Cart.ORDERED;
             case "dropped" -> Cart.DROPPED;
