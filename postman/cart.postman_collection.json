@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "30d39ada-0cba-406e-bdb7-0e8a34079726",
+    "_postman_id": "f9c7ed78-1ba5-4b2c-83e8-bd352a841563",
     "name": "java-webapp /cart",
     "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -1009,7 +1009,7 @@
           }
         },
         {
-          "name": "Unknown ciid -> 404",
+          "name": "Unknown ciid -> 404 no record in DB",
           "event": [
             {
               "listen": "test",
@@ -1019,7 +1019,8 @@
                   "pm.test(\"status.code in [404]\", function () {",
                   "    const body = pm.response.json();",
                   "    pm.expect([404]).to.include(body.status.code);",
-                  "});"
+                  "});",
+                  "pm.test(\"message: no such record in DB\", () => pm.expect(pm.response.json().data).to.include(\"no such record in DB\"));"
                 ]
               }
             }
@@ -1060,7 +1061,7 @@
           }
         },
         {
-          "name": "Other user item -> 403",
+          "name": "Other user item -> 403 another user",
           "event": [
             {
               "listen": "test",
@@ -1070,7 +1071,8 @@
                   "pm.test(\"status.code in [403]\", function () {",
                   "    const body = pm.response.json();",
                   "    pm.expect([403]).to.include(body.status.code);",
-                  "});"
+                  "});",
+                  "pm.test(\"message: belongs to another user\", () => pm.expect(pm.response.json().data).to.include(\"belongs to another user\"));"
                 ]
               }
             }
@@ -1757,7 +1759,7 @@
           }
         },
         {
-          "name": "PATCH item, no open cart -> 422",
+          "name": "PATCH item, no open cart -> 422 (your ordered cart)",
           "event": [
             {
               "listen": "test",
@@ -1767,7 +1769,8 @@
                   "pm.test(\"status.code in [422]\", function () {",
                   "    const body = pm.response.json();",
                   "    pm.expect([422]).to.include(body.status.code);",
-                  "});"
+                  "});",
+                  "pm.test(\"message: belongs to your ordered cart\", () => pm.expect(pm.response.json().data).to.include(\"belongs to your ordered cart\"));"
                 ]
               }
             }
@@ -1855,7 +1858,7 @@
           }
         },
         {
-          "name": "PATCH item of closed cart -> 409",
+          "name": "PATCH item of closed cart -> 409 (your ordered cart)",
           "event": [
             {
               "listen": "test",
@@ -1865,7 +1868,8 @@
                   "pm.test(\"status.code in [409]\", function () {",
                   "    const body = pm.response.json();",
                   "    pm.expect([409]).to.include(body.status.code);",
-                  "});"
+                  "});",
+                  "pm.test(\"message: is not in open cart: it belongs to your ordered cart\", () => pm.expect(pm.response.json().data).to.include(\"is not in open cart: it belongs to your ordered cart\"));"
                 ]
               }
             }

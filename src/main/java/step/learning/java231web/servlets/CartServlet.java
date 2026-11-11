@@ -229,26 +229,35 @@ public class CartServlet extends RestServlet {
     }
 
     /**
-     * Спільні перевірки позиції для PATCH / DELETE (у порядку пріоритету):
-     * 404 - немає у БД; 403 - чужа; 422 - немає відкритого кошика; 409 - позиція не з відкритого кошика
+     * Спільні перевірки позиції для PATCH / DELETE.
+     * Д.З. Спочатку шукаємо ciid у відкритому кошику користувача. Якщо там його немає -
+     * перевіряємо, чи існує такий запис у БД взагалі, і повідомляємо, кому він належить:
+     * 404 - запису немає у БД;
+     * 403 - запис належить кошику іншого користувача;
+     * 422 - запис з власного закритого кошика, а відкритого кошика немає;
+     * 409 - запис належить власному закритому (ordered / dropped) кошику
      */
     private RestResponse checkOwnItem(AuthUser user, String ciid) throws SQLException {
+        Cart open = dataContext.carts().getOpenCart(user.id());
+        if (open != null && open.getItems().stream().anyMatch(i -> ciid.equals(i.getId()))) {
+            return null;  // позиція у відкритому кошику користувача - все гаразд
+        }
+        // у кошику користувача такої позиції немає - з'ясовуємо, чи існує вона взагалі
         CartItem item = dataContext.carts().getItemById(ciid);
         if (item == null) {
-            return error(RestStatus.NotFound, "Cart item not found");
+            return error(RestStatus.NotFound, "Cart item '" + ciid + "' not found: no such record in DB");
         }
         Cart itemCart = dataContext.carts().getById(item.getCartId());
         if (itemCart == null || !user.id().equals(itemCart.getUserId())) {
-            return error(RestStatus.Forbidden, "Cart item belongs to another user");
+            return error(RestStatus.Forbidden, "Cart item '" + ciid + "' exists but belongs to another user's cart");
         }
-        Cart open = dataContext.carts().getOpenCart(user.id());
+        String owner = "your " + itemCart.getState() + " cart '" + itemCart.getId() + "'"
+                + (itemCart.getClosedAt() == null ? "" : " closed at " + itemCart.getClosedAt().toInstant());
         if (open == null) {
-            return error(RestStatus.UnprocessableEntity, "User has no open cart");
+            return error(RestStatus.UnprocessableEntity,
+                    "User has no open cart: cart item '" + ciid + "' belongs to " + owner);
         }
-        if (!open.getId().equals(itemCart.getId())) {
-            return error(RestStatus.Conflict, "Cart item belongs to closed cart");
-        }
-        return null;
+        return error(RestStatus.Conflict, "Cart item '" + ciid + "' is not in open cart: it belongs to " + owner);
     }
 
     // ------------------------------------------------------------ helpers

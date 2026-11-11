@@ -4,11 +4,11 @@ java-webapp /cart
 
 □ 0. Підготовка
 └ Login buyer (Basic) -> token
-  GET http://localhost:8080/java-webapp/user [200 OK, 989B, 66ms]
+  GET http://localhost:8080/java-webapp/user [200 OK, 989B, 54ms]
   √  status.code in [200]
 
 └ Login other user -> token2
-  GET http://localhost:8080/java-webapp/user [200 OK, 1.01kB, 38ms]
+  GET http://localhost:8080/java-webapp/user [200 OK, 1.01kB, 30ms]
   √  status.code in [200]
 
 └ Product with versions -> productWithVersionsId, pvid
@@ -16,24 +16,24 @@ java-webapp /cart
   √  status.code in [200]
 
 └ Reset: drop open cart if any (200 or 404)
-  DELETE http://localhost:8080/java-webapp/cart [404 Not Found, 572B, 5ms]
+  DELETE http://localhost:8080/java-webapp/cart [404 Not Found, 572B, 4ms]
   √  status.code in [200, 404]
 
 □ 1. Авторизація
 └ No token -> 444
-  GET http://localhost:8080/java-webapp/cart [401 Unauthorized, 638B, 6ms]
+  GET http://localhost:8080/java-webapp/cart [401 Unauthorized, 638B, 2ms]
   √  status.code in [444]
 
 └ Malformed token -> 446
-  GET http://localhost:8080/java-webapp/cart [401 Unauthorized, 613B, 5ms]
+  GET http://localhost:8080/java-webapp/cart [401 Unauthorized, 613B, 3ms]
   √  status.code in [445, 446]
 
 └ Token via ?ua= -> 200
-  GET http://localhost:8080/java-webapp/cart?ua=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MWU1MGI5YS03MzIyLTQ3MmYtYmQ5Mi1lZWEzOTA4MjZmM2QiLCJuYW1lIjoiQnV5ZXIgVHdvIiwiZW1haWwiOiJidXllcjJAZXguY29tIiwibG9naW4iOiJidXllcjIiLCJyb2xlIjoidXNlciIsImlhdCI6MTc5NDM4MjM2MiwiZXhwIjoxNzk0Mzg1OTYyfQ.ZRzPNRdBYbu8mp1CMfra0CQIgHGC9SvgB8VeYeQPPio [200 OK, 635B, 5ms]
+  GET http://localhost:8080/java-webapp/cart?ua=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MWU1MGI5YS03MzIyLTQ3MmYtYmQ5Mi1lZWEzOTA4MjZmM2QiLCJuYW1lIjoiQnV5ZXIgVHdvIiwiZW1haWwiOiJidXllcjJAZXguY29tIiwibG9naW4iOiJidXllcjIiLCJyb2xlIjoidXNlciIsImlhdCI6MTc5NDM4MjU5NCwiZXhwIjoxNzk0Mzg2MTk0fQ.3mHxJEV30SqjOxs4u5Uk5_GAaU8TjcynftZvzjG85Uc [200 OK, 635B, 5ms]
   √  status.code in [200]
 
 └ Unknown route /cart/xyz -> 404
-  GET http://localhost:8080/java-webapp/cart/xyz [404 Not Found, 587B, 3ms]
+  GET http://localhost:8080/java-webapp/cart/xyz [404 Not Found, 587B, 2ms]
   √  status.code in [404]
 
 □ 2. Порожній стан
@@ -47,7 +47,7 @@ java-webapp /cart
   √  status.code in [404]
 
 └ Checkout when no cart -> 404
-  POST http://localhost:8080/java-webapp/cart/checkout [404 Not Found, 579B, 28ms]
+  POST http://localhost:8080/java-webapp/cart/checkout [404 Not Found, 579B, 4ms]
   √  status.code in [404]
 
 □ 3. Додавання (POST)
@@ -56,32 +56,32 @@ java-webapp /cart
   √  status.code in [442]
 
 └ Unknown pvid -> 404
-  POST http://localhost:8080/java-webapp/cart?pvid=00000000-0000-0000-0000-000000000000 [404 Not Found, 615B, 6ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=00000000-0000-0000-0000-000000000000 [404 Not Found, 615B, 5ms]
   √  status.code in [404]
 
 └ Deleted product -> 422
-  POST http://localhost:8080/java-webapp/cart?pvid=6f2599b9-d1b4-4006-b21c-6e349907b329 [422 Unprocessable Entity (WebDAV) (RFC 4918), 606B, 5ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=6f2599b9-d1b4-4006-b21c-6e349907b329 [422 Unprocessable Entity (WebDAV) (RFC 4918), 606B, 4ms]
   √  status.code in [422]
 
 └ Out of stock product -> 422
-  POST http://localhost:8080/java-webapp/cart?pvid=daf4f668-705a-4c88-82dc-f575ad31e0aa [422 Unprocessable Entity (WebDAV) (RFC 4918), 611B, 6ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=daf4f668-705a-4c88-82dc-f575ad31e0aa [422 Unprocessable Entity (WebDAV) (RFC 4918), 611B, 5ms]
   √  status.code in [422]
 
 └ Product id instead of version id -> 422
-  POST http://localhost:8080/java-webapp/cart?pvid=f9892151-c38b-4fdd-9bd7-0cf64323cae6 [422 Unprocessable Entity (WebDAV) (RFC 4918), 648B, 6ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=f9892151-c38b-4fdd-9bd7-0cf64323cae6 [422 Unprocessable Entity (WebDAV) (RFC 4918), 648B, 5ms]
   √  status.code in [422]
 
 └ Add version -> 200, save ciid
-  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 29ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 26ms]
   √  status.code in [200]
   √  quantity = 1
 
 └ Add same again -> 208 already in cart
-  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [208 Already Reported (WebDAV) (RFC 5842), 608B, 8ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [208 Already Reported (WebDAV) (RFC 5842), 608B, 6ms]
   √  status.code in [208]
 
 └ GET open cart -> 200
-  GET http://localhost:8080/java-webapp/cart [200 OK, 1.19kB, 6ms]
+  GET http://localhost:8080/java-webapp/cart [200 OK, 1.19kB, 5ms]
   √  status.code in [200]
   √  state open
 
@@ -91,144 +91,148 @@ java-webapp /cart
   √  status.code in [442]
 
 └ No delta -> 422
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc [422 Unprocessable Entity (WebDAV) (RFC 4918), 659B, 3ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336 [422 Unprocessable Entity (WebDAV) (RFC 4918), 659B, 3ms]
   √  status.code in [422]
 
 └ Invalid delta -> 422
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&delta=abc [422 Unprocessable Entity (WebDAV) (RFC 4918), 659B, 3ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&delta=abc [422 Unprocessable Entity (WebDAV) (RFC 4918), 659B, 2ms]
   √  status.code in [422]
 
-└ Unknown ciid -> 404
-  PATCH http://localhost:8080/java-webapp/cart?ciid=00000000-0000-0000-0000-000000000000&delta=1 [404 Not Found, 569B, 4ms]
+└ Unknown ciid -> 404 no record in DB
+  PATCH http://localhost:8080/java-webapp/cart?ciid=00000000-0000-0000-0000-000000000000&delta=1 [404 Not Found, 640B, 5ms]
   √  status.code in [404]
+  √  message: no such record in DB
 
-└ Other user item -> 403
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&delta=1 [403 Forbidden, 583B, 7ms]
+└ Other user item -> 403 another user
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&delta=1 [403 Forbidden, 655B, 6ms]
   √  status.code in [403]
+  √  message: belongs to another user
 
 └ delta=1 -> 200, quantity 2
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&delta=1 [200 OK, 1.19kB, 26ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&delta=1 [200 OK, 1.19kB, 13ms]
   √  status.code in [200]
   √  quantity = 2
 
 └ inc=1 -> 200, quantity 3
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&inc=1 [200 OK, 1.19kB, 16ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&inc=1 [200 OK, 1.19kB, 15ms]
   √  status.code in [200]
   √  quantity = 3
 
 └ cnt=1 -> 200, quantity 1
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&cnt=1 [200 OK, 1.19kB, 17ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&cnt=1 [200 OK, 1.19kB, 12ms]
   √  status.code in [200]
   √  quantity = 1
 
 └ delta=-1 -> warning zero
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&delta=-1 [200 OK, 606B, 8ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&delta=-1 [200 OK, 606B, 6ms]
   √  status.code in [200]
   √  warning: zero quantity
 
 └ delta=-5 -> warning negative
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&delta=-5 [200 OK, 577B, 9ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&delta=-5 [200 OK, 577B, 6ms]
   √  status.code in [200]
   √  warning: negative quantity
 
 └ cnt=999999 -> warning stock limit
-  PATCH http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc&cnt=999999 [200 OK, 576B, 10ms]
+  PATCH http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336&cnt=999999 [200 OK, 576B, 7ms]
   √  status.code in [200]
   √  warning: stock limit
 
 □ 5. Видалення позиції (DELETE ?ciid)
 └ Blank ciid -> 442
-  DELETE http://localhost:8080/java-webapp/cart?ciid= [400 Bad Request, 570B, 3ms]
+  DELETE http://localhost:8080/java-webapp/cart?ciid= [400 Bad Request, 570B, 2ms]
   √  status.code in [442]
 
 └ Unknown ciid -> 404
-  DELETE http://localhost:8080/java-webapp/cart?ciid=00000000-0000-0000-0000-000000000000 [404 Not Found, 570B, 5ms]
+  DELETE http://localhost:8080/java-webapp/cart?ciid=00000000-0000-0000-0000-000000000000 [404 Not Found, 641B, 6ms]
   √  status.code in [404]
 
 └ Other user item -> 403
-  DELETE http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc [403 Forbidden, 584B, 7ms]
+  DELETE http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336 [403 Forbidden, 656B, 6ms]
   √  status.code in [403]
 
 └ Delete item -> 200, cart empty
-  DELETE http://localhost:8080/java-webapp/cart?ciid=e6f581b3-495b-4f81-bd26-d3d68881ddbc [200 OK, 853B, 16ms]
+  DELETE http://localhost:8080/java-webapp/cart?ciid=02d4bb8a-fe72-47bf-8e96-b94ee62d4336 [200 OK, 853B, 21ms]
   √  status.code in [200]
   √  no items
 
 └ Checkout empty cart -> 422
-  POST http://localhost:8080/java-webapp/cart/checkout [422 Unprocessable Entity (WebDAV) (RFC 4918), 613B, 6ms]
+  POST http://localhost:8080/java-webapp/cart/checkout [422 Unprocessable Entity (WebDAV) (RFC 4918), 613B, 4ms]
   √  status.code in [422]
 
 □ 6. Оформлення та закриті кошики
 └ Add version again -> 200, save ciid
-  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 13ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 12ms]
   √  status.code in [200]
 
 └ Checkout POST /cart/checkout -> 200 ordered
-  POST http://localhost:8080/java-webapp/cart/checkout [200 OK, 1.12kB, 19ms]
+  POST http://localhost:8080/java-webapp/cart/checkout [200 OK, 1.12kB, 12ms]
   √  status.code in [200]
   √  state ordered
 
-└ PATCH item, no open cart -> 422
-  PATCH http://localhost:8080/java-webapp/cart?ciid=151780bc-1700-42ea-a9c8-f34e1875d5c5&delta=1 [422 Unprocessable Entity (WebDAV) (RFC 4918), 613B, 7ms]
+└ PATCH item, no open cart -> 422 (your ordered cart)
+  PATCH http://localhost:8080/java-webapp/cart?ciid=1ccedb4b-4650-4982-9952-3a150023cf59&delta=1 [422 Unprocessable Entity (WebDAV) (RFC 4918), 782B, 5ms]
   √  status.code in [422]
+  √  message: belongs to your ordered cart
 
 └ Open new cart (add) -> 200
-  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 18ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 16ms]
   √  status.code in [200]
 
-└ PATCH item of closed cart -> 409
-  PATCH http://localhost:8080/java-webapp/cart?ciid=151780bc-1700-42ea-a9c8-f34e1875d5c5&delta=1 [409 Conflict, 580B, 8ms]
+└ PATCH item of closed cart -> 409 (your ordered cart)
+  PATCH http://localhost:8080/java-webapp/cart?ciid=1ccedb4b-4650-4982-9952-3a150023cf59&delta=1 [409 Conflict, 739B, 7ms]
   √  status.code in [409]
+  √  message: is not in open cart: it belongs to your ordered cart
 
 └ DELETE item of closed cart -> 409
-  DELETE http://localhost:8080/java-webapp/cart?ciid=151780bc-1700-42ea-a9c8-f34e1875d5c5 [409 Conflict, 581B, 9ms]
+  DELETE http://localhost:8080/java-webapp/cart?ciid=1ccedb4b-4650-4982-9952-3a150023cf59 [409 Conflict, 740B, 7ms]
   √  status.code in [409]
 
 └ Checkout DELETE ?checkout -> 200 ordered
-  DELETE http://localhost:8080/java-webapp/cart?checkout [200 OK, 1.11kB, 17ms]
+  DELETE http://localhost:8080/java-webapp/cart?checkout [200 OK, 1.11kB, 13ms]
   √  status.code in [200]
   √  state ordered
 
 └ Open new cart (add) -> 200
-  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 89ms]
+  POST http://localhost:8080/java-webapp/cart?pvid=35b3d7b0-6fc5-4419-bf3e-d0e8ebc93f5c [200 OK, 1.19kB, 16ms]
   √  status.code in [200]
 
 └ Drop cart DELETE /cart -> 200 dropped
-  DELETE http://localhost:8080/java-webapp/cart [200 OK, 1.21kB, 13ms]
+  DELETE http://localhost:8080/java-webapp/cart [200 OK, 1.21kB, 12ms]
   √  status.code in [200]
   √  state dropped
 
 └ History: ordered -> 200
-  GET http://localhost:8080/java-webapp/cart/ordered [200 OK, 2.85kB, 9ms]
+  GET http://localhost:8080/java-webapp/cart/ordered [200 OK, 5.16kB, 11ms]
   √  status.code in [200]
   √  all ordered
 
 └ History: dropped -> 200
-  GET http://localhost:8080/java-webapp/cart/dropped [200 OK, 1.7kB, 5ms]
+  GET http://localhost:8080/java-webapp/cart/dropped [200 OK, 2.85kB, 7ms]
   √  status.code in [200]
   √  all dropped
 
 └ History: all closed -> 200
-  GET http://localhost:8080/java-webapp/cart/history [200 OK, 4.01kB, 10ms]
+  GET http://localhost:8080/java-webapp/cart/history [200 OK, 7.48kB, 13ms]
   √  status.code in [200]
   √  not empty
 
-┌─────────────────────────┬──────────────────┬──────────────────┐
-│                         │         executed │           failed │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              iterations │                1 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│                requests │               47 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│            test-scripts │               47 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│      prerequest-scripts │                0 │                0 │
-├─────────────────────────┼──────────────────┼──────────────────┤
-│              assertions │               63 │                0 │
-├─────────────────────────┴──────────────────┴──────────────────┤
-│ total run duration: 4.6s                                      │
-├───────────────────────────────────────────────────────────────┤
-│ total data received: 32.39kB (approx)                         │
-├───────────────────────────────────────────────────────────────┤
-│ average response time: 12ms [min: 2ms, max: 89ms, s.d.: 15ms] │
-└───────────────────────────────────────────────────────────────┘
+┌─────────────────────────┬─────────────────┬─────────────────┐
+│                         │        executed │          failed │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│              iterations │               1 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│                requests │              47 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│            test-scripts │              47 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│      prerequest-scripts │               0 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│              assertions │              67 │               0 │
+├─────────────────────────┴─────────────────┴─────────────────┤
+│ total run duration: 4.3s                                    │
+├─────────────────────────────────────────────────────────────┤
+│ total data received: 40.1kB (approx)                        │
+├─────────────────────────────────────────────────────────────┤
+│ average response time: 9ms [min: 2ms, max: 54ms, s.d.: 9ms] │
+└─────────────────────────────────────────────────────────────┘
