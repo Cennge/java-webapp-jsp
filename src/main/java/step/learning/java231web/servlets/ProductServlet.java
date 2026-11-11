@@ -13,11 +13,13 @@ import step.learning.java231web.rest.RestPagination;
 import step.learning.java231web.rest.RestResponse;
 import step.learning.java231web.rest.RestServlet;
 import step.learning.java231web.rest.RestStatus;
+import step.learning.java231web.util.Views;
 
 /**
  * API 'Products':
  * GET /product?page=1&pageSize=10 - сторінка товарів
- * GET /product/{id або slug}       - товар з версіями
+ * GET /product/{id або slug}       - товар з версіями (JSON)
+ * GET /product/{slug} з браузера (Accept: text/html) - сторінка товару product.jsp
  * @author ilyag
  */
 @Singleton
@@ -38,7 +40,43 @@ public class ProductServlet extends RestServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idOrSlug = pathTail(req);
+        if (!idOrSlug.isEmpty() && wantsHtml(req)) {
+            productPage(req, resp, idOrSlug);
+            return;
+        }
         send(req, resp, handle(req));
+    }
+
+    /** Браузер просить HTML, API-клієнти (fetch, curl) - JSON; ?json примусово дає JSON */
+    private static boolean wantsHtml(HttpServletRequest req) {
+        String accept = req.getHeader("Accept");
+        return req.getParameter("json") == null && accept != null && accept.contains("text/html");
+    }
+
+    /**
+     * Д.З. Сторінка товару: якщо версій декілька - спільна назва одним заголовком,
+     * версії - лише додатками (Addon); якщо версія одна (або немає) - структура без змін
+     */
+    private void productPage(HttpServletRequest req, HttpServletResponse resp, String slug)
+            throws ServletException, IOException {
+        try {
+            dataContext.ensureInstalled();
+            Product product = dataContext.products().getByIdOrSlug(slug);
+            if (product == null) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                req.setAttribute("notFound", slug);
+            } else {
+                product.setVersions(dataContext.versions().getByProduct(product.getId()));
+                ProductSectionServlet.fixImages(req, product);
+                req.setAttribute("product", product);
+            }
+        } catch (Exception ex) {
+            LOGGER.log(System.Logger.Level.ERROR, "product page " + slug, ex);
+            req.setAttribute("dbError", "Каталог тимчасово недоступний");
+        }
+        req.setAttribute("servlet", "Product");
+        Views.layout(req, resp);
     }
 
     private RestResponse handle(HttpServletRequest req) {

@@ -558,3 +558,17 @@ pre code {
 .muted {
     color: #6a737d;
 }
+
+/* Сторінка товару /product/{slug} */
+.product-crumbs { color: #64748b; font-size: .9em; margin-bottom: 8px; }
+.product-title { margin: 8px 0 6px; }
+.product-desc { color: #334155; }
+.product-single { display: grid; grid-template-columns: minmax(0, 320px) 1fr; gap: 24px; align-items: start; }
+.product-single img, .product-single .product-card-noimg { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 10px; background: #f8fafc; }
+.version-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.version-card { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
+.version-card img, .version-card .product-card-noimg { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; background: #f8fafc; }
+.version-addon { font-weight: 600; font-size: 1.05em; }
+.stock-ok { color: #15803d; font-size: .9em; }
+.stock-none { color: #b91c1c; font-size: .9em; }
+@media (max-width: 600px) { .product-single { grid-template-columns: 1fr; } }
