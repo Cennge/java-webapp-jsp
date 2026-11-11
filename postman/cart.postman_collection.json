@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "f9c7ed78-1ba5-4b2c-83e8-bd352a841563",
+    "_postman_id": "a2829fd6-2a53-4919-82a2-2c70726f0065",
     "name": "java-webapp /cart",
     "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -550,7 +550,7 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/cart?pvid=00000000-0000-0000-0000-000000000000",
+              "raw": "{{baseUrl}}/cart?pvid={{unknownCiid}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -560,7 +560,7 @@
               "query": [
                 {
                   "key": "pvid",
-                  "value": "00000000-0000-0000-0000-000000000000"
+                  "value": "{{unknownCiid}}"
                 }
               ]
             },
@@ -1029,7 +1029,7 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/cart?ciid=00000000-0000-0000-0000-000000000000&delta=1",
+              "raw": "{{baseUrl}}/cart?ciid={{unknownCiid}}&delta=1",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1039,7 +1039,7 @@
               "query": [
                 {
                   "key": "ciid",
-                  "value": "00000000-0000-0000-0000-000000000000"
+                  "value": "{{unknownCiid}}"
                 },
                 {
                   "key": "delta",
@@ -1497,7 +1497,7 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/cart?ciid=00000000-0000-0000-0000-000000000000",
+              "raw": "{{baseUrl}}/cart?ciid={{unknownCiid}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1507,7 +1507,7 @@
               "query": [
                 {
                   "key": "ciid",
-                  "value": "00000000-0000-0000-0000-000000000000"
+                  "value": "{{unknownCiid}}"
                 }
               ]
             },
@@ -2223,6 +2223,1070 @@
           }
         }
       ]
+    },
+    {
+      "name": "7. PATCH /cart - статуси відповідей (змінна {{ciid}})",
+      "description": "Усі запити папки використовують одну змінну {{ciid}}. Перший запит заповнює її автоматично; щоб перевірити власний ciid - змініть значення ciid у Variables колекції (діє на всі запити одразу) і запускайте запити без Setup.",
+      "item": [
+        {
+          "name": "Setup: add item to open cart -> ciid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"ciid\", pm.response.json().data.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH no token -> 444 / HTTP 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [444]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([444]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "PATCH malformed token -> 446 / HTTP 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [446]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([446]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "not.a.token",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH no ciid -> 442 / HTTP 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH blank ciid -> 442 / HTTP 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid=&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": ""
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH no delta -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH delta=abc -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH unknown ciid -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"message: no such record in DB\", () => pm.expect(pm.response.json().data).to.include(\"no such record in DB\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{unknownCiid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{unknownCiid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH other user -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [403]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([403]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"message: another user\", () => pm.expect(pm.response.json().data).to.include(\"another user\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH delta=1 -> 200, quantity 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"quantity = 2\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH inc=2 -> 200, quantity 4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"quantity = 4\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(4));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&inc=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "inc",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH delta=-1 -> 200, quantity 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"quantity = 3\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "-1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH cnt=1 -> 200, quantity 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"quantity = 1\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&cnt=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "cnt",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH cnt=0 -> 200 warning zero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"warning: zero quantity\", () => pm.expect(pm.response.json().data).to.include(\"zero quantity\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&cnt=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "cnt",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH delta=-9 -> 200 warning negative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"warning: negative quantity\", () => pm.expect(pm.response.json().data).to.include(\"negative quantity\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=-9",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "-9"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH cnt=999999 -> 200 warning stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"warning: stock limit\", () => pm.expect(pm.response.json().data).to.include(\"stock limit\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&cnt=999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "cnt",
+                  "value": "999999"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: checkout (close cart)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH item of ordered cart, no open cart -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"message: belongs to your ordered cart\", () => pm.expect(pm.response.json().data).to.include(\"belongs to your ordered cart\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: open new cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH item of ordered cart -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [409]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([409]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"message: is not in open cart\", () => pm.expect(pm.response.json().data).to.include(\"is not in open cart\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cleanup: drop open cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -2273,6 +3337,10 @@
     {
       "key": "ciid",
       "value": ""
+    },
+    {
+      "key": "unknownCiid",
+      "value": "00000000-0000-0000-0000-000000000000"
     }
   ]
 }
