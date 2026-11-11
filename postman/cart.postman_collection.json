@@ -1,0 +1,2274 @@
+{
+  "info": {
+    "_postman_id": "30d39ada-0cba-406e-bdb7-0e8a34079726",
+    "name": "java-webapp /cart",
+    "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Підготовка",
+      "description": "Токени та ідентифікатори. Запускати колекцію цілком (Run collection): запити залежать один від одного",
+      "item": [
+        {
+          "name": "Login buyer (Basic) -> token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"token\", pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{login}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login other user -> token2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"token2\", pm.response.json().data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "{{login2}}",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "{{password2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Product with versions -> productWithVersionsId, pvid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "const d = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"productWithVersionsId\", d.id);",
+                  "pm.collectionVariables.set(\"pvid\", d.versions.find(v => v.stock > 0).id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/product/iphone-18-pro-max?json",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "product",
+                "iphone-18-pro-max"
+              ],
+              "query": [
+                {
+                  "key": "json",
+                  "value": null
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Reset: drop open cart if any (200 or 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200, 404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200, 404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Авторизація",
+      "description": "",
+      "item": [
+        {
+          "name": "No token -> 444",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [444]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([444]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Malformed token -> 446",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [445, 446]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([445, 446]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "not.a.token",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Token via ?ua= -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ua={{token}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ua",
+                  "value": "{{token}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Unknown route /cart/xyz -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/xyz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "xyz"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Порожній стан",
+      "description": "",
+      "item": [
+        {
+          "name": "GET open cart (none) -> 200, data null",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"data is null\", () => pm.expect(pm.response.json().data).to.be.null);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Drop cart when none -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Checkout when no cart -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Додавання (POST)",
+      "description": "",
+      "item": [
+        {
+          "name": "No pvid -> 442",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unknown pvid -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid=00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deleted product -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{deletedProductId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{deletedProductId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Out of stock product -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{outOfStockProductId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{outOfStockProductId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Product id instead of version id -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{productWithVersionsId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{productWithVersionsId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add version -> 200, save ciid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "const c = pm.response.json().data;",
+                  "pm.collectionVariables.set(\"ciid\", c.items[0].id);",
+                  "pm.test(\"quantity = 1\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add same again -> 208 already in cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [208]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([208]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET open cart -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"state open\", () => pm.expect(pm.response.json().data.state).to.eql(\"open\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Зміна кількості (PATCH)",
+      "description": "",
+      "item": [
+        {
+          "name": "No ciid -> 442",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "No delta -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Invalid delta -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "abc"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unknown ciid -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid=00000000-0000-0000-0000-000000000000&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user item -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [403]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([403]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "delta=1 -> 200, quantity 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"quantity = 2\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "inc=1 -> 200, quantity 3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"quantity = 3\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&inc=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "inc",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "cnt=1 -> 200, quantity 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"quantity = 1\", () => pm.expect(pm.response.json().data.items[0].quantity).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&cnt=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "cnt",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "delta=-1 -> warning zero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"warning: zero quantity\", () => pm.expect(pm.response.json().data).to.include(\"zero quantity\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "-1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "delta=-5 -> warning negative",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"warning: negative quantity\", () => pm.expect(pm.response.json().data).to.include(\"negative quantity\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=-5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "-5"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "cnt=999999 -> warning stock limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"warning: stock limit\", () => pm.expect(pm.response.json().data).to.include(\"stock limit\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&cnt=999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "cnt",
+                  "value": "999999"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Видалення позиції (DELETE ?ciid)",
+      "description": "",
+      "item": [
+        {
+          "name": "Blank ciid -> 442",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unknown ciid -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid=00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "00000000-0000-0000-0000-000000000000"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user item -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [403]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([403]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete item -> 200, cart empty",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"no items\", () => pm.expect(pm.response.json().data.items).to.be.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Checkout empty cart -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Оформлення та закриті кошики",
+      "description": "",
+      "item": [
+        {
+          "name": "Add version again -> 200, save ciid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"ciid\", pm.response.json().data.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Checkout POST /cart/checkout -> 200 ordered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"state ordered\", () => pm.expect(pm.response.json().data.state).to.eql(\"ordered\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH item, no open cart -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Open new cart (add) -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH item of closed cart -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [409]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([409]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}&delta=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                },
+                {
+                  "key": "delta",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE item of closed cart -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [409]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([409]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Checkout DELETE ?checkout -> 200 ordered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"state ordered\", () => pm.expect(pm.response.json().data.state).to.eql(\"ordered\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "checkout",
+                  "value": null
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Open new cart (add) -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Drop cart DELETE /cart -> 200 dropped",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"state dropped\", () => pm.expect(pm.response.json().data.state).to.eql(\"dropped\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "History: ordered -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"all ordered\", () => pm.response.json().data.forEach(c => pm.expect(c.state).to.eql(\"ordered\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/ordered",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "ordered"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "History: dropped -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"all dropped\", () => pm.response.json().data.forEach(c => pm.expect(c.state).to.eql(\"dropped\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/dropped",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "dropped"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "History: all closed -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"not empty\", () => pm.expect(pm.response.json().data).to.not.be.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "history"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/java-webapp"
+    },
+    {
+      "key": "login",
+      "value": "buyer2"
+    },
+    {
+      "key": "password",
+      "value": "Secret123"
+    },
+    {
+      "key": "login2",
+      "value": "acc_25150"
+    },
+    {
+      "key": "password2",
+      "value": "Secret123"
+    },
+    {
+      "key": "deletedProductId",
+      "value": "6f2599b9-d1b4-4006-b21c-6e349907b329"
+    },
+    {
+      "key": "outOfStockProductId",
+      "value": "daf4f668-705a-4c88-82dc-f575ad31e0aa"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "token2",
+      "value": ""
+    },
+    {
+      "key": "productWithVersionsId",
+      "value": ""
+    },
+    {
+      "key": "pvid",
+      "value": ""
+    },
+    {
+      "key": "ciid",
+      "value": ""
+    }
+  ]
+}
