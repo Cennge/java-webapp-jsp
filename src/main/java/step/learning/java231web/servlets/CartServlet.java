@@ -198,6 +198,11 @@ public class CartServlet extends RestServlet {
         if (ciid.isBlank()) {
             return error(RestStatus.QueryParameterRequired, "'ciid' - cart item id");
         }
+        // Д.З. поглиблена перевірка перед видаленням CartItem (checkOwnItem):
+        // 1) запис взагалі існує у БД                      -> інакше 404
+        // 2) запис належить авторизованому користувачеві    -> інакше 403
+        // 3) у користувача є відкритий кошик                -> інакше 422
+        // 4) запис належить саме відкритому (активному) кошику -> інакше 409
         RestResponse denied = checkOwnItem(user, ciid.trim());
         if (denied != null) {
             return denied;

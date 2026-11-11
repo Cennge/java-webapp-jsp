@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "a2829fd6-2a53-4919-82a2-2c70726f0065",
+    "_postman_id": "8cc383bd-d51b-429e-a008-1ae484575eef",
     "name": "java-webapp /cart",
     "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -3287,6 +3287,574 @@
           }
         }
       ]
+    },
+    {
+      "name": "8. DELETE /cart?ciid - поглиблена перевірка",
+      "description": "Порядок перевірок при видаленні CartItem: 404 (немає у БД) -> 403 (чужий) -> 422 (немає відкритого кошика) -> 409 (не з відкритого кошика). Використовує спільну змінну {{ciid}}.",
+      "item": [
+        {
+          "name": "Setup: add item -> ciid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"ciid\", pm.response.json().data.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE no token -> 444 / HTTP 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [444]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([444]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "DELETE blank ciid -> 442 / HTTP 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [442]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([442]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1) not in DB -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"message: no such record in DB\", () => pm.expect(pm.response.json().data).to.include(\"no such record in DB\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{unknownCiid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{unknownCiid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2) other user item -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [403]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([403]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"message: another user\", () => pm.expect(pm.response.json().data).to.include(\"another user\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: checkout (no open cart now)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "checkout"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3) user has no open cart -> 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [422]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([422]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"message: User has no open cart\", () => pm.expect(pm.response.json().data).to.include(\"User has no open cart\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Setup: open new cart, save its item -> ciidOpen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.collectionVariables.set(\"ciidOpen\", pm.response.json().data.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4) item of closed (ordered) cart -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [409]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([409]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"message: is not in open cart\", () => pm.expect(pm.response.json().data).to.include(\"is not in open cart\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "OK: delete item of open cart -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"item removed\", () => pm.expect(pm.response.json().data.items).to.be.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciidOpen}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciidOpen}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deleted item again -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"message: no such record in DB\", () => pm.expect(pm.response.json().data).to.include(\"no such record in DB\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?ciid={{ciidOpen}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "ciid",
+                  "value": "{{ciidOpen}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cleanup: drop open cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -3336,6 +3904,10 @@
     },
     {
       "key": "ciid",
+      "value": ""
+    },
+    {
+      "key": "ciidOpen",
       "value": ""
     },
     {
