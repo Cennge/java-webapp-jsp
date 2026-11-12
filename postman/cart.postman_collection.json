@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "14d4a737-0a81-430a-b3e4-e96e3e32dab3",
+    "_postman_id": "501591e2-c863-447e-b243-c3287fcaae30",
     "name": "java-webapp /cart",
     "description": "Д.З. Усі варіанти роботи точки /cart (успішні та помилкові). Запускати цілком через Run collection: запити передають один одному token / ciid. Код у тілі (status.code): 442 -> HTTP 400, 444-446 -> HTTP 401.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -4252,6 +4252,224 @@
                   "type": "string"
                 }
               ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. GET /cart/{cartId} - належність кошика",
+      "description": "Кошик за id: 200 - власний, 403 - кошик іншого користувача, 404 - немає такого. Використовує orderedCartId / droppedCartId з папки 9",
+      "item": [
+        {
+          "name": "Own ordered cart -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"same cart\", () => pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get(\"orderedCartId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/{{orderedCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "{{orderedCartId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Own dropped cart -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [200]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([200]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"state dropped\", () => pm.expect(pm.response.json().data.state).to.eql(\"dropped\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/{{droppedCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "{{droppedCartId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Other user's cart -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [403]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([403]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+                  "pm.test(\"message: belongs to another user\", () => pm.expect(pm.response.json().data).to.include(\"belongs to another user\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/{{orderedCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "{{orderedCartId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token2}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unknown cart id -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [404]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([404]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"message: not found\", () => pm.expect(pm.response.json().data).to.include(\"not found\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/{{unknownCiid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "{{unknownCiid}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "No token -> 444 / HTTP 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status.code in [444]\", function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect([444]).to.include(body.status.code);",
+                  "});",
+                  "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart/{{orderedCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "{{orderedCartId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
             }
           }
         }

@@ -95,11 +95,27 @@ public class CartServlet extends RestServlet {
             default -> -1;
         };
         if (status != null && status == -1) {
-            return error(RestStatus.NotFound, "Unknown cart route '/" + tail + "'");
+            return getCartById(req, user, tail);   // GET /cart/{cartId}
         }
         List<Cart> carts = dataContext.carts().getClosedCarts(user.id(), status);
         carts.forEach(c -> fixImages(req, c));
         return new RestResponse(RestStatus.Ok, carts);
+    }
+
+    /**
+     * GET /cart/{cartId} - кошик за ідентифікатором.
+     * Д.З. перевірка, що кошик належить авторизованому користувачеві:
+     * 404 - кошика з таким id немає; 403 - кошик іншого користувача; 200 - кошик
+     */
+    private RestResponse getCartById(HttpServletRequest req, AuthUser user, String cartId) throws SQLException {
+        Cart cart = dataContext.carts().getById(cartId);
+        if (cart == null) {
+            return error(RestStatus.NotFound, "Cart '" + cartId + "' not found");
+        }
+        if (!user.id().equals(cart.getUserId())) {
+            return error(RestStatus.Forbidden, "Cart '" + cartId + "' belongs to another user");
+        }
+        return ok(req, cart);
     }
 
     /**
