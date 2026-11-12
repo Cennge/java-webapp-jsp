@@ -22,13 +22,21 @@ public class CartItem {
     private String title;
     private String imageUrl;
     private BigDecimal total = BigDecimal.ZERO;   // ціна x кількість (полем - для JSON)
+    private Product product;                      // товар (imageUrl - повне посилання)
+    private ProductVersion productVersion;        // версія товару або null
+
 
     /** Рядок з cart_items, приєднаними products та (необов'язково) product_versions */
     public static CartItem fromResultSet(ResultSet rs) throws SQLException {
         String addon = rs.getString("product_version_title_addon");
         String versionImage = rs.getString("product_version_image");
         Timestamp added = rs.getTimestamp("cart_item_add_dt");
+        // ci.product_id іде першим у SELECT ci.*, p.*, v.* - тому для версії без запису
+        // (LEFT JOIN дає null) product_id береться з cart_items
         return new CartItem()
+                .setProduct(Product.fromResultSet(rs))
+                .setProductVersion(rs.getString("product_version_id") == null
+                        ? null : ProductVersion.fromResultSet(rs))
                 .setId(rs.getString("cart_item_id"))
                 .setCartId(rs.getString("cart_id"))
                 .setProductId(rs.getString("product_id"))
@@ -116,6 +124,24 @@ public class CartItem {
 
     public CartItem setTitle(String title) {
         this.title = title;
+        return this;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public CartItem setProduct(Product product) {
+        this.product = product;
+        return this;
+    }
+
+    public ProductVersion getProductVersion() {
+        return productVersion;
+    }
+
+    public CartItem setProductVersion(ProductVersion productVersion) {
+        this.productVersion = productVersion;
         return this;
     }
 

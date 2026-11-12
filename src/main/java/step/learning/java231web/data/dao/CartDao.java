@@ -22,8 +22,7 @@ import step.learning.java231web.services.db.IDbService;
  */
 @Singleton
 public class CartDao {
-    private static final String ITEMS_SELECT = "SELECT ci.*, p.product_title, p.product_image, "
-            + "v.product_version_title_addon, v.product_version_image "
+    private static final String ITEMS_SELECT = "SELECT ci.*, p.*, v.* "
             + "FROM cart_items ci "
             + "JOIN products p ON p.product_id = ci.product_id "
             + "LEFT JOIN product_versions v ON v.product_version_id = ci.product_version_id ";

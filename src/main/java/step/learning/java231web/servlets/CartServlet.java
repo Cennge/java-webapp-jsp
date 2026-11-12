@@ -310,8 +310,19 @@ public class CartServlet extends RestServlet {
     }
 
     private static void fixImages(HttpServletRequest req, Cart cart) {
+        // Д.З. imageUrl товару та версії - повні посилання на зображення (/storage/...)
         for (CartItem item : cart.getItems()) {
             item.setImageUrl(storageUrl(req, item.getImageUrl()));
+            if (item.getProduct() != null) {
+                item.getProduct().setImageUrl(storageUrl(req, item.getProduct().getImageUrl()));
+            }
+            if (item.getProductVersion() != null) {
+                // версія без власного зображення показує зображення товару
+                String own = item.getProductVersion().getImageUrl();
+                item.getProductVersion().setImageUrl(own != null && !own.isBlank()
+                        ? storageUrl(req, own)
+                        : item.getProduct() == null ? null : item.getProduct().getImageUrl());
+            }
         }
     }
 
