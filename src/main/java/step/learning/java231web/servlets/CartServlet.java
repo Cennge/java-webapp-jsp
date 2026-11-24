@@ -24,6 +24,8 @@ import step.learning.java231web.services.token.ITokenService;
 /**
  * API 'Cart' (кошик автентифікованого користувача, токен - Authorization: Bearer або ?ua=):
  * GET    /cart                       - відкритий кошик (data: null, якщо його немає)
+ * GET    /cart?buy                   - перехід до кошика з початком оформлення (ніби натиснуто «Придбати»):
+ *                                      meta.parameters.checkoutStarted = true, посилання meta.links.confirm
  * GET    /cart/ordered | /dropped | /history - оформлені / скасовані / усі закриті кошики
  * POST   /cart?pvid=...              - додати товар (id версії або id товару без версій)
  * PATCH  /cart?ciid=...&delta=+1|-1  - змінити кількість (або &cnt=N - встановити)
@@ -84,7 +86,17 @@ public class CartServlet extends RestServlet {
     private RestResponse get(HttpServletRequest req, AuthUser user) throws SQLException {
         String tail = pathTail(req);
         if (tail.isEmpty()) {
-            return ok(req, dataContext.carts().getOpenCart(user.id()));
+            RestResponse response = ok(req, dataContext.carts().getOpenCart(user.id()));
+            // Д.З. Додати параметр переходу до сторінки /cart, який свідчить про початок її оформлення:
+            //      наче було натиснуто кнопку "Придбати". Параметр ?buy (значення не важливе, ?buy=false вимикає)
+            if (req.getParameter("buy") != null && !"false".equalsIgnoreCase(req.getParameter("buy"))) {
+                boolean hasItems = response.getData() instanceof Cart c && !c.getItems().isEmpty();
+                response.getMeta()
+                        .addParameter("checkoutStarted", true)
+                        .addParameter("checkoutReady", hasItems)   // оформлювати є що лише за наявності позицій
+                        .addLink("confirm", req.getContextPath() + "/cart/checkout");
+            }
+            return response;
         }
         // Д.З. /cart/ordered - історія лише придбаних (оформлених) кошиків, без скасованих;
         //      /cart/dropped - лише скасовані; /cart/history - усі закриті

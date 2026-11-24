@@ -4474,6 +4474,347 @@
           }
         }
       ]
+    },
+    {
+      "name": "11. GET /cart?buy - початок оформлення",
+      "item": [
+        {
+          "name": "Скасувати відкритий кошик (чиста підготовка)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200 або 4xx без падіння\", () => { pm.expect(pm.response.code).to.be.oneOf([200,404,422]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "?buy, кошик порожній -> checkoutStarted true, checkoutReady false",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+                  "pm.test(\"meta.parameters.checkoutStarted === true\", () => { const b = pm.response.json(); pm.expect(b.meta.parameters.checkoutStarted).to.eql(true); });",
+                  "pm.test(\"meta.parameters.checkoutReady === false\", () => { const b = pm.response.json(); pm.expect(b.meta.parameters.checkoutReady).to.eql(false); });",
+                  "pm.test(\"meta.links.confirm веде на /cart/checkout\", () => { const b = pm.response.json(); pm.expect(b.meta.links.confirm).to.match(/\\/cart\\/checkout$/); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?buy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "buy",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Додати товар у кошик",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?pvid={{pvid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "pvid",
+                  "value": "{{pvid}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "?buy, у кошику є товар -> checkoutReady true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+                  "pm.test(\"meta.parameters.checkoutStarted === true\", () => { const b = pm.response.json(); pm.expect(b.meta.parameters.checkoutStarted).to.eql(true); });",
+                  "pm.test(\"meta.parameters.checkoutReady === true\", () => { const b = pm.response.json(); pm.expect(b.meta.parameters.checkoutReady).to.eql(true); });",
+                  "pm.test(\"meta.links.confirm веде на /cart/checkout\", () => { const b = pm.response.json(); pm.expect(b.meta.links.confirm).to.match(/\\/cart\\/checkout$/); });",
+                  "pm.test(\"data - відкритий кошик із позиціями\", () => { const b = pm.response.json(); pm.expect(b.data.itemsCount).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?buy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "buy",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "?buy=false -> без ознак оформлення",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+                  "pm.test(\"checkoutStarted відсутній\", () => { const b = pm.response.json(); pm.expect((b.meta.parameters||{}).checkoutStarted).to.be.undefined; });",
+                  "pm.test(\"посилання confirm відсутнє\", () => { const b = pm.response.json(); pm.expect(b.meta.links.confirm).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?buy=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "buy",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Звичайний GET /cart -> без ознак оформлення",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });",
+                  "pm.test(\"checkoutStarted відсутній\", () => { const b = pm.response.json(); pm.expect((b.meta.parameters||{}).checkoutStarted).to.be.undefined; });",
+                  "pm.test(\"checkoutReady відсутній\", () => { const b = pm.response.json(); pm.expect((b.meta.parameters||{}).checkoutReady).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "?buy без токена -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", () => { pm.response.to.have.status(401); });",
+                  "pm.test(\"checkoutStarted відсутній\", () => { const b = pm.response.json(); pm.expect((b.meta.parameters||{}).checkoutStarted).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart?buy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ],
+              "query": [
+                {
+                  "key": "buy",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Прибирання: скасувати кошик",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
@@ -4499,11 +4840,11 @@
     },
     {
       "key": "deletedProductId",
-      "value": "6f2599b9-d1b4-4006-b21c-6e349907b329"
+      "value": "cbde7dec-90fd-4db3-9ff6-993f3306f069"
     },
     {
       "key": "outOfStockProductId",
-      "value": "daf4f668-705a-4c88-82dc-f575ad31e0aa"
+      "value": "0c28c223-68dc-4ef2-862e-f66c0fd185e6"
     },
     {
       "key": "token",
